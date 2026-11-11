@@ -153,7 +153,23 @@ nav.tabs button.on{background:var(--ink);color:var(--bg);font-weight:600}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 footer{color:var(--mut);font-size:12.5px;text-align:center;margin-top:36px;padding-top:18px;border-top:1px solid var(--line)}
 footer a{color:inherit}
-@keyframes up{from{opacity:0;transform:translateY(8px)}}
+@keyframes up{from{opacity:0;transform:translateY(10px)}}
+@keyframes pop{from{opacity:0;transform:scale(.94) translateY(6px)}}
+@keyframes bye{to{opacity:0;transform:scale(.94)}}
+@keyframes grow{from{transform:scaleX(0)}}
+.cls{view-transition-class:card}.col{view-transition-class:colm}
+.day,.chip,.acct,.opt,.up,.bk button{transition:background .18s,border-color .18s,color .18s,box-shadow .18s,transform .18s}
+.chip:active,.day:active,nav.tabs button:active{transform:scale(.96)}
+::view-transition-group(*){animation-duration:.38s;animation-timing-function:cubic-bezier(.22,.8,.2,1)}
+::view-transition-old(root){animation-duration:.18s}::view-transition-new(root){animation-duration:.3s}
+::view-transition-new(*.card):only-child{animation:pop .34s cubic-bezier(.22,.8,.2,1) both}
+::view-transition-old(*.card):only-child{animation:bye .2s ease both}
+::view-transition-old(*.colm),::view-transition-new(*.colm){height:100%;object-fit:fill}
+main.in .grid .col{animation:up .5s cubic-bezier(.22,.8,.2,1) both}
+main.in .grid .col:nth-child(2){animation-delay:40ms}main.in .grid .col:nth-child(3){animation-delay:80ms}main.in .grid .col:nth-child(4){animation-delay:120ms}main.in .grid .col:nth-child(5){animation-delay:160ms}main.in .grid .col:nth-child(6){animation-delay:200ms}main.in .grid .col:nth-child(7){animation-delay:240ms}
+main.in .list .cls,main.in .pkc,main.in .hw{animation:up .45s cubic-bezier(.22,.8,.2,1) both}
+main.in .list .cls:nth-child(2),main.in .pkc:nth-child(2),main.in .hw:nth-child(2){animation-delay:50ms}main.in .list .cls:nth-child(3),main.in .pkc:nth-child(3),main.in .hw:nth-child(3){animation-delay:100ms}main.in .list .cls:nth-child(4),main.in .pkc:nth-child(4),main.in .hw:nth-child(4){animation-delay:150ms}main.in .list .cls:nth-child(n+5){animation-delay:200ms}
+main.in .bar i,.prog i{transform-origin:left;animation:grow .8s .25s cubic-bezier(.22,.8,.2,1) both}
 main.in>*{animation:up .32s cubic-bezier(.2,.8,.2,1) both}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -192,7 +208,7 @@ function cupo(c){
 }
 function card(c){
   var k=cupo(c),off=(c.past||c.cancelled)&&!c.my_booking;
-  return '<button class="cls'+(off?' off':'')+(k.cls==='mine'?' res':'')+'" style="--c:'+esc(c.color)+'" data-s="'+c.id+'"'+(off?' disabled':'')+'>'
+  return '<button class="cls'+(off?' off':'')+(k.cls==='mine'?' res':'')+'" style="--c:'+esc(c.color)+';view-transition-name:c'+c.id+'" data-s="'+c.id+'"'+(off?' disabled':'')+'>'
     +'<div class="t">'+c.time+'<small>'+c.duration_min+' min</small></div>'
     +'<div><div class="n">'+esc(c.discipline)+'</div><div class="m">'+esc([c.instructor,c.room].filter(Boolean).join(' · ')||' ')+'</div></div>'
     +'<div class="s '+k.cls+'"><b>'+k.t+'</b>'+k.s+(c.past||c.cancelled?'':'<div class="bar"><i style="width:'+Math.round(100*c.booked/Math.max(1,c.capacity))+'%"></i></div>')+'</div></button>';
@@ -206,9 +222,9 @@ function vHorario(){
   if(st.disciplines.length>1)h+='<div class="chips"><button class="chip'+(S.disc?'':' on')+'" data-f="0">Todas</button>'+st.disciplines.map(function(d){return '<button class="chip'+(S.disc===d.id?' on':'')+'" style="--c:'+esc(d.color)+'" data-f="'+d.id+'"><span class="dot"></span>'+esc(d.name)+'</button>'}).join('')+'</div>';
   var hoy=by[S.day]||[];
   h+='<div class="list mobile">'+(hoy.length?hoy.map(card).join(''):'<div class="empty">No hay clases el '+largo(S.day)+'.</div>')+'</div>';
-  h+='<div class="grid">'+days.map(function(f){var d=pd(f),l=by[f]||[];return '<div class="col'+(f===st.today?' today':f<st.today?' gone':'')+'"><h3><span>'+DN[d.getUTCDay()]+'</span><span>'+d.getUTCDate()+'</span></h3>'+(l.length?l.map(card).join(''):'<div class="none">Sin clases</div>')+'</div>'}).join('')+'</div>';
+  h+='<div class="grid">'+days.map(function(f){var d=pd(f),l=by[f]||[];return '<div class="col'+(f===st.today?' today':f<st.today?' gone':'')+'" style="view-transition-name:col'+d.getUTCDay()+'"><h3><span>'+DN[d.getUTCDay()]+'</span><span>'+d.getUTCDate()+'</span></h3>'+(l.length?l.map(card).join(''):'<div class="none">Sin clases</div>')+'</div>'}).join('')+'</div>';
   var vd=st.packages.length?Math.max.apply(null,st.packages.map(function(p){return p.valid_days})):0;
-  h+='<div class="sec" style="margin-top:30px">Cómo funciona</div><div class="how">'+[['1','Comprá tu paquete','Elegís cuántas sesiones querés y pagás por QR. Sirven para cualquier disciplina.'],['2','Reservá tu clase','Del día o de toda la semana, hasta '+st.studio.days_ahead+' días antes. Cada reserva usa una sesión.'],['3','Cancelá hasta '+st.studio.cancel_hours+' h antes','La sesión vuelve a tu paquete. Con menos anticipación, se descuenta.']].concat(vd?[['4','Vigencia de '+vd+' días','Tus sesiones valen '+vd+' días calendario desde la compra.']]:[]).map(function(x){return '<div class="hw"><span>'+x[0]+'</span><b>'+x[1]+'</b><p>'+x[2]+'</p></div>'}).join('')+'</div>';
+  h+='<div class="sec" style="margin-top:30px;view-transition-name:howt">Cómo funciona</div><div class="how" style="view-transition-name:how">'+[['1','Comprá tu paquete','Elegís cuántas sesiones querés y pagás por QR. Sirven para cualquier disciplina.'],['2','Reservá tu clase','Del día o de toda la semana, hasta '+st.studio.days_ahead+' días antes. Cada reserva usa una sesión.'],['3','Cancelá hasta '+st.studio.cancel_hours+' h antes','La sesión vuelve a tu paquete. Con menos anticipación, se descuenta.']].concat(vd?[['4','Vigencia de '+vd+' días','Tus sesiones valen '+vd+' días calendario desde la compra.']]:[]).map(function(x){return '<div class="hw"><span>'+x[0]+'</span><b>'+x[1]+'</b><p>'+x[2]+'</p></div>'}).join('')+'</div>';
   return h;
 }
 function vPaquetes(){
@@ -231,7 +247,13 @@ function vMias(){
   h+='<div style="margin-top:22px;max-width:220px"><button class="btn line" id="salir">Cerrar sesión</button></div>';
   return h;
 }
+var VT=!!document.startViewTransition&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
 function render(){
+  // transición suave entre un estado y el siguiente (filtro, día, semana, pestaña): las tarjetas que siguen se mueven a su lugar, las que salen se desvanecen
+  if(VT&&draw.k!==undefined){try{document.startViewTransition(draw);return}catch(e){}}
+  draw();
+}
+function draw(){
   var st=S.info.studio;
   document.documentElement.style.setProperty('--acc',st.color);document.title=st.name+' · Horarios';
   var I=S.info,nc=S.sessions.filter(function(c){return !c.cancelled}).length,mn=null;I.packages.forEach(function(p){var u=p.price/p.sessions;if(mn===null||u<mn)mn=u});
@@ -239,9 +261,9 @@ function render(){
   var h='<header><div><div class="eyebrow"><i></i>Horarios y reservas</div><h1>'+esc(st.name)+'</h1>'+(st.intro?'<p class="intro">'+esc(st.intro)+'</p>':'')+(stats.length?'<div class="stats">'+stats.map(function(x){return '<span class="stat">'+x+'</span>'}).join('')+'</div>':'')+'</div>'
     +(S.me?'<button class="acct" data-tab="mias"><b>'+esc(S.me.student.name.split(' ')[0])+'</b><span class="cr">'+credits()+'</span></button>':'<button class="acct cta" id="goLogin2">Entrar</button>')+'</header>';
   h+='<nav class="tabs">'+[['horario','Horario'],['paquetes','Paquetes'],['mias','Mis reservas']].map(function(t){return '<button class="'+(S.tab===t[0]?'on':'')+'" data-tab="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</nav>';
-  h+='<main'+(render.k!==S.tab+S.from?' class="in"':'')+'>'+(S.tab==='horario'?vHorario():S.tab==='paquetes'?vPaquetes():vMias())+'</main>';
+  h+='<main'+(draw.k===undefined||(!VT&&draw.k!==S.tab+S.from)?' class="in"':'')+'>'+(S.tab==='horario'?vHorario():S.tab==='paquetes'?vPaquetes():vMias())+'</main>';
   h+='<footer>'+[st.address?esc(st.address):'',st.whatsapp?'WhatsApp '+esc(st.whatsapp):''].filter(Boolean).join(' · ')+'</footer>';
-  $('app').innerHTML=h;render.k=S.tab+S.from;
+  $('app').innerHTML=h;draw.k=S.tab+S.from;
 }
 function loadWeek(){return api('GET','/schedule?from='+S.from+'&days=7').then(function(r){if(r.ok){S.sessions=r.sessions;S.info.today=r.today}})}
 function loadMe(){if(!S.token){S.me=null;return Promise.resolve()}return api('GET','/me').then(function(r){S.me=r.ok?r:null})}
@@ -332,7 +354,7 @@ api('GET','/info').then(function(r){
     var n=S.sessions.filter(ok)[0];
     if(n){S.day=n.date;render()}else{S.from=add(S.from,7);S.day=S.from;loadWeek().then(function(){var m=S.sessions.filter(ok)[0];if(m)S.day=m.date;render()})}
   });
-  setInterval(function(){if(!document.hidden&&!$('ov').classList.contains('on'))loadWeek().then(function(){if(S.tab==='horario')render()})},30000);
+  setInterval(function(){if(!document.hidden&&!$('ov').classList.contains('on'))loadWeek().then(function(){if(S.tab==='horario')draw()})},30000);
 });
 })();
 </script>
