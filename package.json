@@ -1,0 +1,31 @@
+{
+  "name": "web-horarios-clases",
+  "version": "0.1.0",
+  "description": "Horarios y reservas de clases por sesiones: paquetes, cupos, cancelación y lista de espera",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/*.test.js",
+    "seed": "node scripts/seed-demo.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jasm91/web-horarios-clases.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/jasm91/web-horarios-clases/issues"
+  },
+  "homepage": "https://github.com/jasm91/web-horarios-clases#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "express": "^5.3.0",
+    "pg": "^8.23.1"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}

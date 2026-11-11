@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Horarios y reservas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap">
+<style>
+:root{--acc:#f97316;--bg:#f6f5f2;--card:#fff;--ink:#17181c;--mut:#6b6f7b;--line:#e4e2dc;--ok:#15803d;--warn:#b45309;--bad:#b91c1c;--soft:#efeeea;--r:16px;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0e0f13;--card:#17191f;--ink:#f1f2f5;--mut:#9a9fad;--line:#272a33;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--soft:#1e2028;color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Outfit,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px calc(96px + env(safe-area-inset-bottom))}
+header{padding:22px 0 14px;display:flex;gap:14px;align-items:flex-start;justify-content:space-between}
+h1{font-size:26px;line-height:1.1;margin:0;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+.intro{color:var(--mut);margin:6px 0 0;max-width:56ch}
+.acct{flex:none;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-weight:500;font-size:14px;max-width:46vw}
+.acct b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acct .cr{background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc);border-radius:999px;padding:2px 8px;font-weight:600;font-variant-numeric:tabular-nums;flex:none}
+nav.tabs{position:sticky;top:0;z-index:5;display:flex;gap:4px;padding:8px 0;background:linear-gradient(var(--bg) 78%,transparent);margin-bottom:6px}
+nav.tabs button{padding:9px 14px;border-radius:999px;color:var(--mut);font-weight:500}
+nav.tabs button.on{background:var(--ink);color:var(--bg)}
+.weekbar{display:flex;align-items:center;gap:8px;margin:6px 0 10px}
+.weekbar .lbl{font-weight:600;flex:1;text-transform:capitalize}
+.ic{width:38px;height:38px;border-radius:12px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-size:17px}
+.ic:disabled{opacity:.35;cursor:default}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:12px}
+.day{padding:8px 0 9px;border-radius:14px;background:var(--card);border:1px solid var(--line);text-align:center;line-height:1.15}
+.day small{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.day b{font-size:18px;font-variant-numeric:tabular-nums}
+.day i{display:block;width:5px;height:5px;border-radius:50%;margin:4px auto 0;background:transparent}
+.day.has i{background:var(--acc)}
+.day.on{background:var(--acc);border-color:var(--acc);color:#fff}.day.on small{color:rgba(255,255,255,.85)}.day.on i{background:#fff}
+.day.today:not(.on){border-color:var(--acc)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;scrollbar-width:none}
+.chip{flex:none;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:13.5px;display:flex;align-items:center;gap:6px}
+.chip.on{border-color:var(--ink);font-weight:600}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--c,var(--acc))}
+.list{display:flex;flex-direction:column;gap:8px}
+.cls{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;border-left:4px solid var(--c,var(--acc));text-align:left;width:100%}
+.cls .t{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.cls .t small{display:block;font-size:11.5px;color:var(--mut);font-weight:400;margin-top:4px}
+.cls .n{font-weight:600;font-size:16px}
+.cls .m{color:var(--mut);font-size:13px;margin-top:1px}
+.cls .s{text-align:right;font-size:12.5px;color:var(--mut);white-space:nowrap}
+.cls .s b{display:block;font-size:13.5px;color:var(--ink)}
+.cls .s.low b{color:var(--warn)}.cls .s.full b{color:var(--bad)}.cls .s.mine b{color:var(--ok)}
+.cls.off{opacity:.5}
+.bar{height:4px;border-radius:2px;background:var(--soft);margin-top:6px;overflow:hidden;width:74px;margin-left:auto}
+.bar i{display:block;height:100%;background:var(--c,var(--acc));border-radius:2px}
+.empty{padding:34px 14px;text-align:center;color:var(--mut);border:1px dashed var(--line);border-radius:var(--r)}
+.grid{display:none}
+@media (min-width:940px){
+  .days,.list.mobile{display:none}
+  .grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;align-items:start}
+  .col h3{margin:0 0 8px;font-size:13px;font-weight:600;text-transform:capitalize;color:var(--mut);display:flex;justify-content:space-between}
+  .col.today h3{color:var(--acc)}
+  .col .cls{grid-template-columns:1fr;gap:4px;padding:10px 11px;margin-bottom:8px}
+  .col .cls .t{font-size:16px}.col .cls .t small{display:inline;margin-left:6px}
+  .col .cls .n{font-size:14.5px}.col .cls .s{text-align:left}.col .bar{margin-left:0}
+  .col .none{font-size:12.5px;color:var(--mut);padding:10px 2px}
+}
+.pk{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.pkc{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:4px}
+.pkc .q{font-size:34px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.pkc .q small{font-size:14px;font-weight:500;color:var(--mut);margin-left:4px}
+.pkc .p{font-size:18px;font-weight:600;margin-top:8px}
+.pkc .d{color:var(--mut);font-size:13px}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:8px;padding:12px 16px;border-radius:13px;background:var(--acc);color:#fff;font-weight:600;width:100%}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.ghost{background:var(--soft);color:var(--ink)}
+.btn.line{background:none;border:1px solid var(--line);color:var(--ink)}
+.btn.danger{background:none;border:1px solid color-mix(in srgb,var(--bad) 45%,transparent);color:var(--bad)}
+.pkc .btn{margin-top:12px}
+.sec{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin:20px 0 8px;font-weight:600}
+.mine{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:8px}
+.mine .row{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.mine .big{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.prog{height:6px;border-radius:3px;background:var(--soft);overflow:hidden;margin:8px 0 6px}.prog i{display:block;height:100%;background:var(--acc)}
+.tag{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--mut);font-weight:500}
+.tag.w{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}.tag.g{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}.tag.b{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.bk{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--c,var(--acc));border-radius:var(--r);padding:12px 14px;margin-bottom:8px}
+.bk .n{font-weight:600}.bk .m{color:var(--mut);font-size:13px;text-transform:capitalize}
+.bk button{padding:8px 12px;border-radius:11px;border:1px solid var(--line);font-size:13.5px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:20;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s}
+.ov.on{opacity:1;pointer-events:auto}
+.sheet{background:var(--card);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));max-height:92dvh;overflow-y:auto;transform:translateY(18px);transition:transform .2s}
+.ov.on .sheet{transform:none}
+@media (min-width:640px){.ov{align-items:center}.sheet{border-radius:22px}}
+.sheet h2{margin:0 0 2px;font-size:20px;letter-spacing:-.01em}
+.sheet .sub{color:var(--mut);margin-bottom:14px;text-transform:capitalize}
+.fld{margin-bottom:10px}.fld label{display:block;font-size:12.5px;color:var(--mut);margin-bottom:4px}
+.fld input{width:100%;padding:12px 13px;border-radius:12px;border:1px solid var(--line);background:var(--bg);outline:none}
+.fld input:focus{border-color:var(--acc)}
+.opt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:13px;border:1px solid var(--line);border-radius:14px;margin-bottom:8px;background:var(--bg)}
+.opt.on{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 8%,var(--bg))}
+.opt b{display:block}.opt small{color:var(--mut)}
+.opt .rd{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);flex:none}.opt.on .rd{border:5px solid var(--acc)}
+.qr{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center;margin-bottom:10px}
+.qr img{max-width:220px;width:100%;border-radius:10px;display:block;margin:0 auto 8px;background:#fff}
+.up{display:block;border:1.5px dashed var(--line);border-radius:14px;padding:13px;text-align:center;color:var(--mut);margin-bottom:10px;cursor:pointer}
+.up.ok{border-style:solid;border-color:var(--ok);color:var(--ok)}
+.up input{display:none}
+.note{font-size:13px;color:var(--mut);margin:8px 0 12px}
+.err{color:var(--bad);font-size:13.5px;margin:6px 0 10px;min-height:1em}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:13px;font-weight:500;opacity:0;transition:.22s;z-index:40;max-width:calc(100vw - 32px);text-align:center;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+footer{color:var(--mut);font-size:12.5px;text-align:center;margin-top:28px}
+footer a{color:inherit}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><div class="empty" style="margin-top:40px">Cargando…</div></div>
+<div class="ov" id="ov"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+'use strict';
+var slug=decodeURIComponent(location.pathname.split('/')[2]||''),API='/api/s/'+encodeURIComponent(slug),LS='hc_'+slug;
+var S={tab:'horario',info:null,from:null,day:null,sessions:[],disc:0,me:null,token:null};
+try{S.token=localStorage.getItem(LS)}catch(e){}
+var $=function(id){return document.getElementById(id)};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function api(m,p,b){return fetch(API+p,{method:m,headers:Object.assign({'Content-Type':'application/json'},S.token?{Authorization:'Bearer '+S.token}:{}),body:b?JSON.stringify(b):undefined}).then(function(r){return r.json().catch(function(){return{ok:false,error:'Sin respuesta del servidor.'}}).then(function(j){if(r.status===401&&j.code==='login'){S.token=null;S.me=null;try{localStorage.removeItem(LS)}catch(e){}}return j})}).catch(function(){return{ok:false,error:'No hay conexión. Probá de nuevo.'}})}
+function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on')},3200)}
+var DN=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'],DS=['dom','lun','mar','mié','jue','vie','sáb'],MN=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+function pd(f){var a=f.split('-').map(Number);return new Date(Date.UTC(a[0],a[1]-1,a[2]))}
+function fd(d){return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0')}
+function add(f,n){var d=pd(f);d.setUTCDate(d.getUTCDate()+n);return fd(d)}
+function lunes(f){var d=pd(f).getUTCDay();return add(f,d===0?-6:1-d)}
+function largo(f){var d=pd(f);return DN[d.getUTCDay()]+' '+d.getUTCDate()+' de '+MN[d.getUTCMonth()]}
+function money(n){return S.info.studio.currency+' '+(Number(n)%1?Number(n).toFixed(2):Number(n))}
+function credits(){return S.me?S.me.credits:0}
+
+function cupo(c){
+  if(c.my_status==='booked'||c.my_status==='attended')return{cls:'mine',t:'Reservada ✓',s:''};
+  if(c.my_status==='waitlist')return{cls:'low',t:'En lista de espera',s:''};
+  if(c.cancelled)return{cls:'full',t:'Cancelada',s:''};
+  if(c.past)return{cls:'',t:'Ya pasó',s:''};
+  if(c.free===0)return{cls:'full',t:'Llena',s:c.waiting?c.waiting+' en espera':'Lista de espera'};
+  if(c.free<=3)return{cls:'low',t:c.free===1?'Último lugar':'Últimos '+c.free,s:'de '+c.capacity};
+  return{cls:'',t:c.free+' lugares',s:'de '+c.capacity};
+}
+function card(c){
+  var k=cupo(c),off=(c.past||c.cancelled)&&!c.my_booking;
+  return '<button class="cls'+(off?' off':'')+'" style="--c:'+esc(c.color)+'" data-s="'+c.id+'"'+(off?' disabled':'')+'>'
+    +'<div class="t">'+c.time+'<small>'+c.duration_min+' min</small></div>'
+    +'<div><div class="n">'+esc(c.discipline)+'</div><div class="m">'+esc([c.instructor,c.room].filter(Boolean).join(' · ')||' ')+'</div></div>'
+    +'<div class="s '+k.cls+'"><b>'+k.t+'</b>'+k.s+(c.past||c.cancelled?'':'<div class="bar"><i style="width:'+Math.round(100*c.booked/Math.max(1,c.capacity))+'%"></i></div>')+'</div></button>';
+}
+function vHorario(){
+  var st=S.info,ses=S.sessions.filter(function(c){return !S.disc||c.discipline_id===S.disc});
+  var days=[];for(var i=0;i<7;i++)days.push(add(S.from,i));
+  var by={};ses.forEach(function(c){(by[c.date]=by[c.date]||[]).push(c)});
+  var h='<div class="weekbar"><button class="ic" id="wp" aria-label="Semana anterior"'+(S.from<=lunes(st.today)?' disabled':'')+'>‹</button><div class="lbl">'+pd(days[0]).getUTCDate()+' '+MN[pd(days[0]).getUTCMonth()]+' – '+pd(days[6]).getUTCDate()+' '+MN[pd(days[6]).getUTCMonth()]+'</div><button class="ic" id="wn" aria-label="Semana siguiente"'+(add(S.from,7)>add(st.today,st.studio.days_ahead)?' disabled':'')+'>›</button></div>';
+  h+='<div class="days">'+days.map(function(f){var d=pd(f);return '<button class="day'+(f===S.day?' on':'')+(f===st.today?' today':'')+(by[f]&&by[f].some(function(c){return !c.past&&!c.cancelled})?' has':'')+'" data-d="'+f+'"><small>'+DS[d.getUTCDay()]+'</small><b>'+d.getUTCDate()+'</b><i></i></button>'}).join('')+'</div>';
+  if(st.disciplines.length>1)h+='<div class="chips"><button class="chip'+(S.disc?'':' on')+'" data-f="0">Todas</button>'+st.disciplines.map(function(d){return '<button class="chip'+(S.disc===d.id?' on':'')+'" data-f="'+d.id+'"><span class="dot" style="--c:'+esc(d.color)+'"></span>'+esc(d.name)+'</button>'}).join('')+'</div>';
+  var hoy=by[S.day]||[];
+  h+='<div class="list mobile">'+(hoy.length?hoy.map(card).join(''):'<div class="empty">No hay clases el '+largo(S.day)+'.</div>')+'</div>';
+  h+='<div class="grid">'+days.map(function(f){var d=pd(f),l=by[f]||[];return '<div class="col'+(f===st.today?' today':'')+'"><h3><span>'+DN[d.getUTCDay()]+'</span><span>'+d.getUTCDate()+'</span></h3>'+(l.length?l.map(card).join(''):'<div class="none">Sin clases</div>')+'</div>'}).join('')+'</div>';
+  h+='<p class="note" style="margin-top:14px">Podés cancelar o cambiar hasta '+st.studio.cancel_hours+' h antes y la sesión vuelve a tu paquete. Con menos anticipación, se descuenta.</p>';
+  return h;
+}
+function vPaquetes(){
+  var st=S.info;
+  if(!st.packages.length)return '<div class="empty">Este estudio todavía no publicó paquetes.</div>';
+  return '<div class="pk">'+st.packages.map(function(p){return '<div class="pkc"><div class="q">'+p.sessions+'<small>'+(p.sessions===1?'sesión':'sesiones')+'</small></div><div class="p">'+money(p.price)+'</div><div class="d">'+money(p.price/p.sessions)+' por sesión · vale '+p.valid_days+' días</div><button class="btn" data-buy="'+p.id+'">Comprar</button></div>'}).join('')+'</div>'
+    +(st.studio.single_price!=null?'<p class="note" style="margin-top:14px">¿Querés probar primero? La clase suelta cuesta '+money(st.studio.single_price)+': elegí una clase en el horario y pagala ahí.</p>':'');
+}
+function vMias(){
+  if(!S.me)return '<div class="empty">Entrá con tu WhatsApp para ver tus sesiones y reservas.<div style="margin-top:14px;max-width:260px;margin-inline:auto"><button class="btn" id="goLogin">Entrar</button></div></div>';
+  var m=S.me,h='<div class="sec" style="margin-top:6px">Tus paquetes</div>';
+  var act=m.packages.filter(function(p){return !p.expired});
+  h+=act.length?act.map(function(p){return '<div class="mine"><div class="row"><b>'+esc(p.name)+'</b>'+(p.status==='pending'?'<span class="tag w">pago por verificar</span>':'<span class="tag g">activo</span>')+'</div><div class="row" style="margin-top:6px"><span class="big">'+p.remaining+'<span style="font-size:14px;font-weight:500;color:var(--mut)"> de '+p.total+' sesiones</span></span><span class="tag'+(p.days_left<=7?' w':'')+'">'+(p.days_left===0?'vence hoy':'vence en '+p.days_left+' día'+(p.days_left===1?'':'s'))+'</span></div><div class="prog"><i style="width:'+Math.round(100*p.remaining/Math.max(1,p.total))+'%"></i></div></div>'}).join(''):'<div class="empty">No tenés un paquete activo.<div style="margin-top:14px;max-width:260px;margin-inline:auto"><button class="btn" data-tab="paquetes">Ver paquetes</button></div></div>';
+  h+='<div class="sec">Próximas clases</div>';
+  h+=m.upcoming.length?m.upcoming.map(function(b){return '<div class="bk" style="--c:'+esc(b.color)+'"><div><div class="n">'+esc(b.discipline)+' · '+b.time+(b.status==='waitlist'?' <span class="tag w">lista de espera</span>':'')+(b.pay==='single_pending'?' <span class="tag w">pago por verificar</span>':'')+'</div><div class="m">'+largo(b.date)+(b.instructor?' · '+esc(b.instructor):'')+'</div></div><button data-cancel="'+b.id+'" data-free="'+(b.free_cancel||b.status==='waitlist'?1:0)+'">Cancelar</button></div>'}).join(''):'<div class="empty">Todavía no reservaste ninguna clase.</div>';
+  if(m.history.length){var E={cancelled:['cancelada',''],late_cancel:['cancelada tarde','b'],attended:['asististe','g'],no_show:['no asististe','b'],booked:['reservada','']};
+    h+='<div class="sec">Historial</div>'+m.history.slice(0,12).map(function(b){var e=E[b.status]||[b.status,''];return '<div class="bk" style="--c:'+esc(b.color)+';opacity:.8"><div><div class="n">'+esc(b.discipline)+' · '+b.time+'</div><div class="m">'+largo(b.date)+'</div></div><span class="tag '+e[1]+'">'+e[0]+'</span></div>'}).join('')}
+  h+='<div style="margin-top:22px;max-width:220px"><button class="btn line" id="salir">Cerrar sesión</button></div>';
+  return h;
+}
+function render(){
+  var st=S.info.studio;
+  document.documentElement.style.setProperty('--acc',st.color);document.title=st.name+' · Horarios';
+  var h='<header><div><h1>'+esc(st.name)+'</h1>'+(st.intro?'<p class="intro">'+esc(st.intro)+'</p>':'')+'</div>'
+    +(S.me?'<button class="acct" data-tab="mias"><b>'+esc(S.me.student.name.split(' ')[0])+'</b><span class="cr">'+credits()+'</span></button>':'<button class="acct" id="goLogin2">Entrar</button>')+'</header>';
+  h+='<nav class="tabs">'+[['horario','Horario'],['paquetes','Paquetes'],['mias','Mis reservas']].map(function(t){return '<button class="'+(S.tab===t[0]?'on':'')+'" data-tab="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</nav>';
+  h+='<main>'+(S.tab==='horario'?vHorario():S.tab==='paquetes'?vPaquetes():vMias())+'</main>';
+  h+='<footer>'+(st.address?esc(st.address)+' · ':'')+(st.whatsapp?'WhatsApp '+esc(st.whatsapp):'')+'</footer>';
+  $('app').innerHTML=h;
+}
+function loadWeek(){return api('GET','/schedule?from='+S.from+'&days=7').then(function(r){if(r.ok){S.sessions=r.sessions;S.info.today=r.today}})}
+function loadMe(){if(!S.token){S.me=null;return Promise.resolve()}return api('GET','/me').then(function(r){S.me=r.ok?r:null})}
+function refresh(){return Promise.all([loadWeek(),loadMe()]).then(render)}
+
+// ── hoja inferior ──
+function open(html){$('sheet').innerHTML=html;$('ov').classList.add('on')}
+function close(){$('ov').classList.remove('on')}
+$('ov').addEventListener('click',function(e){if(e.target===this)close()});
+function errIn(t){var e=$('sheet').querySelector('.err');if(e)e.textContent=t||''}
+function loginSheet(then,needName){
+  open('<h2>Entrá con tu WhatsApp</h2><div class="sub" style="text-transform:none">Si es tu primera vez, creamos tu cuenta acá mismo.</div>'
+    +'<div class="fld"><label>Tu número de WhatsApp (con código de país)</label><input id="lph" inputmode="tel" autocomplete="tel" placeholder="591 7XXXXXXX"></div>'
+    +'<div class="fld" id="lnmW"'+(needName?'':' hidden')+'><label>Tu nombre y apellido</label><input id="lnm" autocomplete="name"></div>'
+    +'<div class="fld"><label>PIN de 4 a 6 números (elegilo vos; lo vas a usar para entrar)</label><input id="lpin" inputmode="numeric" type="password" maxlength="6" autocomplete="off"></div>'
+    +'<div class="err"></div><button class="btn" id="lgo">Continuar</button>');
+  $('lgo').onclick=function(){var b=this;b.disabled=true;errIn('');
+    api('POST','/auth',{phone:$('lph').value,pin:$('lpin').value,name:$('lnm').value}).then(function(r){b.disabled=false;
+      if(r.need_name){$('lnmW').hidden=false;$('lnm').focus();return errIn('Es tu primera vez: decinos tu nombre.')}
+      if(!r.ok)return errIn(r.error);
+      S.token=r.token;try{localStorage.setItem(LS,r.token)}catch(e){}
+      refresh().then(function(){if(then)then();else{close();toast(r.created?'¡Listo! Tu cuenta quedó creada.':'Hola de nuevo, '+r.student.name.split(' ')[0])}})})};
+}
+function fileToData(f){return new Promise(function(ok,no){if(f.size>5*1024*1024)return no('El archivo pesa más de 5 MB.');var r=new FileReader();r.onload=function(){ok(r.result)};r.onerror=function(){no('No se pudo leer el archivo.')};r.readAsDataURL(f)})}
+function payBlock(monto){var st=S.info.studio;
+  return '<div class="qr">'+(st.qr_image?'<img src="'+esc(st.qr_image)+'" alt="QR de pago">':'<div class="note" style="margin:6px 0">El estudio todavía no cargó su QR. Pedíselo por WhatsApp y subí acá tu comprobante.</div>')+'<b>'+money(monto)+'</b>'+(st.qr_holder?'<div class="note" style="margin:2px 0 0">A nombre de '+esc(st.qr_holder)+'</div>':'')+'</div>'
+    +'<label class="up" id="upL"><input type="file" id="upF" accept="image/png,image/jpeg,image/webp,application/pdf"><span id="upT">📎 Subir comprobante (foto, captura o PDF)</span></label>';
+}
+function wireUp(){var f=$('upF');if(!f)return;f.onchange=function(){if(f.files[0]){$('upT').textContent='✓ '+f.files[0].name;$('upL').classList.add('ok')}}}
+function bookSheet(c){
+  if(!S.me)return loginSheet(function(){var n=S.sessions.filter(function(x){return x.id===c.id})[0];bookSheet(n||c)});
+  var st=S.info.studio,sub=largo(c.date)+' · '+c.time+(c.instructor?' · '+esc(c.instructor):'');
+  if(c.my_booking){var mb=S.me.upcoming.filter(function(b){return b.id===c.my_booking})[0];
+    return open('<h2>'+esc(c.discipline)+'</h2><div class="sub">'+sub+'</div><p class="note">'+(c.my_status==='waitlist'?'Estás en la lista de espera. Si se libera un lugar y tenés sesiones, te lo reservamos solo.':'Ya tenés tu lugar en esta clase.')+'</p><div class="err"></div><button class="btn danger" id="bc">'+(c.my_status==='waitlist'?'Salir de la lista de espera':'Cancelar mi reserva')+'</button>'),void($('bc').onclick=function(){cancelFlow(c.my_booking,mb?mb.free_cancel||mb.status==='waitlist':true)})}
+  if(c.free===0)return open('<h2>'+esc(c.discipline)+'</h2><div class="sub">'+sub+'</div><p class="note">La clase está llena. Podés anotarte en la lista de espera: si alguien cancela y tenés sesiones en tu paquete, el lugar es tuyo automáticamente.</p><div class="err"></div><button class="btn" id="bw">Anotarme en la lista de espera</button>'),void($('bw').onclick=function(){doBook(c,{waitlist:true},this)});
+  var cr=credits(),single=st.single_price!=null,mode=cr>0?'package':(single?'single':'none');
+  function paint(){
+    var h='<h2>'+esc(c.discipline)+'</h2><div class="sub">'+sub+'</div>';
+    if(cr>0)h+='<button class="opt'+(mode==='package'?' on':'')+'" data-m="package"><span class="rd"></span><span><b>Usar mi paquete</b><small>Te quedan '+cr+' sesi'+(cr===1?'ón':'ones')+'</small></span></button>';
+    if(single)h+='<button class="opt'+(mode==='single'?' on':'')+'" data-m="single"><span class="rd"></span><span><b>Clase suelta · '+money(st.single_price)+'</b><small>Pagás por QR y subís el comprobante</small></span></button>';
+    if(mode==='single')h+=payBlock(st.single_price)+'<p class="note">Tu lugar queda guardado mientras el estudio verifica el pago.</p>';
+    if(mode==='none')h+='<p class="note">Para reservar necesitás un paquete con sesiones.</p>';
+    h+='<div class="err"></div>'+(mode==='none'?'<button class="btn" data-tab="paquetes">Ver paquetes</button>':'<button class="btn" id="bgo">Confirmar reserva</button>')+(cr===0&&S.info.packages.length&&mode!=='none'?'<div style="margin-top:8px"><button class="btn ghost" data-tab="paquetes">Mejor compro un paquete</button></div>':'');
+    open(h);wireUp();
+    [].forEach.call($('sheet').querySelectorAll('[data-m]'),function(b){b.onclick=function(){mode=b.dataset.m;paint()}});
+    var g=$('bgo');if(g)g.onclick=function(){var b=this;
+      if(mode==='package')return doBook(c,{pay:'package'},b);
+      var f=$('upF').files[0];if(!f)return errIn('Subí el comprobante del pago.');
+      b.disabled=true;fileToData(f).then(function(d){doBook(c,{pay:'single',receipt:d},b)},function(m){b.disabled=false;errIn(m)})};
+  }
+  paint();
+}
+function doBook(c,o,btn){btn.disabled=true;errIn('');
+  api('POST','/book',Object.assign({session_id:c.id},o)).then(function(r){btn.disabled=false;
+    if(!r.ok){if(r.code==='llena'){refresh().then(function(){var n=S.sessions.filter(function(x){return x.id===c.id})[0];if(n)bookSheet(n)});return}return errIn(r.error)}
+    close();refresh();toast(r.status==='waitlist'?'Quedaste en la lista de espera.':o.pay==='single'?'¡Reservada! El estudio va a verificar tu pago.':'¡Reservada! Te quedan '+(r.package?r.package.remaining:0)+' sesiones.')})}
+function cancelFlow(id,free){
+  var st=S.info.studio;
+  open('<h2>¿Cancelar la reserva?</h2><p class="note">'+(free?'Estás a tiempo: la sesión vuelve a tu paquete.':'Faltan menos de '+st.cancel_hours+' horas para la clase: si cancelás ahora, la sesión <b>se descuenta igual</b>. Cancelar libera tu lugar para otra persona.')+'</p><div class="err"></div><button class="btn danger" id="cy">Sí, cancelar</button><div style="margin-top:8px"><button class="btn ghost" id="cn">Volver</button></div>');
+  $('cn').onclick=close;
+  $('cy').onclick=function(){var b=this;b.disabled=true;api('POST','/bookings/'+id+'/cancel').then(function(r){b.disabled=false;if(!r.ok)return errIn(r.error);close();refresh();toast(r.waitlist?'Saliste de la lista de espera.':r.refunded?'Cancelada. La sesión volvió a tu paquete.':'Cancelada.'+(r.late?' La sesión se descontó.':''))})};
+}
+function buySheet(p){
+  if(!S.me)return loginSheet(function(){buySheet(p)});
+  open('<h2>'+esc(p.name)+'</h2><div class="sub" style="text-transform:none">'+p.sessions+' sesiones · valen '+p.valid_days+' días desde hoy</div>'+payBlock(p.price)+'<p class="note">Apenas subís el comprobante ya podés reservar. El estudio verifica el pago y te lo confirma.</p><div class="err"></div><button class="btn" id="pgo">Enviar comprobante</button>');
+  wireUp();
+  $('pgo').onclick=function(){var b=this,f=$('upF').files[0];if(!f)return errIn('Subí el comprobante del pago.');b.disabled=true;
+    fileToData(f).then(function(d){return api('POST','/packages/buy',{package_id:p.id,receipt:d})},function(m){return{ok:false,error:m}}).then(function(r){b.disabled=false;if(!r.ok)return errIn(r.error);close();S.tab='horario';refresh();toast('¡Listo! Ya podés reservar tus clases.')})};
+}
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-tab],[data-d],[data-f],[data-s],[data-buy],[data-cancel],#wp,#wn,#goLogin,#goLogin2,#salir');if(!t)return;
+  if(t.dataset.tab){close();S.tab=t.dataset.tab;render();window.scrollTo(0,0)}
+  else if(t.dataset.d){S.day=t.dataset.d;render()}
+  else if(t.dataset.f!==undefined){S.disc=Number(t.dataset.f);render()}
+  else if(t.dataset.s){var c=S.sessions.filter(function(x){return x.id===Number(t.dataset.s)})[0];if(c)bookSheet(c)}
+  else if(t.dataset.buy){var p=S.info.packages.filter(function(x){return x.id===Number(t.dataset.buy)})[0];if(p)buySheet(p)}
+  else if(t.dataset.cancel)cancelFlow(Number(t.dataset.cancel),t.dataset.free==='1')
+  else if(t.id==='wp'||t.id==='wn'){S.from=add(S.from,t.id==='wp'?-7:7);S.day=S.from<S.info.today&&S.info.today<=add(S.from,6)?S.info.today:S.from;loadWeek().then(render)}
+  else if(t.id==='goLogin'||t.id==='goLogin2')loginSheet()
+  else if(t.id==='salir'){S.token=null;S.me=null;try{localStorage.removeItem(LS)}catch(e2){}refresh()}
+});
+api('GET','/info').then(function(r){
+  if(!r.ok){$('app').innerHTML='<div class="empty" style="margin-top:40px">'+esc(r.error||'No encontramos ese estudio.')+'</div>';return}
+  S.info=r;S.from=lunes(r.today);S.day=r.today;
+  refresh().then(function(){ // si hoy ya no queda nada para reservar, se abre en el próximo día con clases
+    var ok=function(c){return !c.past&&!c.cancelled};
+    if(S.sessions.some(function(c){return c.date===S.day&&ok(c)}))return;
+    var n=S.sessions.filter(ok)[0];
+    if(n){S.day=n.date;render()}else{S.from=add(S.from,7);S.day=S.from;loadWeek().then(function(){var m=S.sessions.filter(ok)[0];if(m)S.day=m.date;render()})}
+  });
+  setInterval(function(){if(!document.hidden&&!$('ov').classList.contains('on'))loadWeek().then(function(){if(S.tab==='horario')render()})},30000);
+});
+})();
+</script>
+</body>
+</html>

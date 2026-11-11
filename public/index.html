@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Horarios de clases</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap">
+<style>
+:root{--bg:#f6f5f2;--ink:#17181c;--mut:#6b6f7b;--line:#e4e2dc;--card:#fff;--acc:#f97316}
+@media (prefers-color-scheme:dark){:root{--bg:#0e0f13;--ink:#f1f2f5;--mut:#9a9fad;--line:#272a33;--card:#17191f}}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Outfit,system-ui,sans-serif}
+main{max-width:720px;margin:0 auto;padding:12vh 20px 60px}
+h1{font-size:clamp(30px,6vw,46px);line-height:1.05;letter-spacing:-.03em;margin:0 0 14px;text-wrap:balance}
+p{color:var(--mut);max-width:56ch}
+ul{padding:0;list-style:none;display:grid;gap:10px;margin:26px 0}
+li{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 16px}
+li b{display:block}
+a.b{display:inline-block;background:var(--acc);color:#fff;text-decoration:none;font-weight:600;padding:12px 18px;border-radius:13px;margin-right:8px}
+a.g{color:var(--ink)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Horarios y reservas para estudios que trabajan por sesiones</h1>
+  <p>Tus alumnos compran un paquete, reservan la clase que quieren y cancelan dentro de tu plazo. Vos ves cada clase con su lista y verificás los pagos.</p>
+  <ul>
+    <li><b>Horario semanal con cupos en vivo</b>Varias disciplinas, profes y salas. Lista de espera automática.</li>
+    <li><b>Paquetes de sesiones</b>Saldo y vencimiento por alumno. Compra por QR con comprobante.</li>
+    <li><b>Tu regla de cancelación</b>A tiempo, la sesión vuelve al paquete. Tarde, se descuenta.</li>
+  </ul>
+  <a class="b" href="/admin">Entrar al panel</a>
+</main>
+</body>
+</html>

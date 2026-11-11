@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Panel del estudio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap">
+<style>
+:root{--acc:#f97316;--bg:#f6f5f2;--card:#fff;--ink:#17181c;--mut:#6b6f7b;--line:#e4e2dc;--ok:#15803d;--warn:#b45309;--bad:#b91c1c;--soft:#efeeea;--r:14px;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0e0f13;--card:#17191f;--ink:#f1f2f5;--mut:#9a9fad;--line:#272a33;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--soft:#1e2028;color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14.5px/1.45 Outfit,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+.shell{display:grid;grid-template-columns:210px 1fr;min-height:100dvh}
+aside{background:var(--card);border-right:1px solid var(--line);padding:18px 12px;position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;gap:2px}
+aside h1{font-size:16px;margin:0 8px 14px;line-height:1.2}
+aside h1 small{display:block;font-weight:400;color:var(--mut);font-size:12px}
+aside button{display:flex;justify-content:space-between;align-items:center;text-align:left;padding:9px 10px;border-radius:10px;color:var(--mut);font-weight:500}
+aside button.on{background:var(--soft);color:var(--ink)}
+aside .n{background:var(--acc);color:#fff;border-radius:999px;font-size:11.5px;padding:1px 7px;font-weight:600}
+aside .sp{flex:1}
+aside a{color:var(--mut);font-size:13px;padding:8px 10px;text-decoration:none}
+main{padding:22px 24px 60px;min-width:0;max-width:1100px}
+h2{font-size:22px;margin:0 0 14px;letter-spacing:-.01em}
+h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin:22px 0 8px}
+@media (max-width:760px){.shell{grid-template-columns:1fr}aside{position:static;height:auto;flex-direction:row;overflow-x:auto;padding:8px;border-right:0;border-bottom:1px solid var(--line)}aside h1,aside .sp,aside a{display:none}aside button{flex:none;gap:6px}main{padding:16px 14px 60px}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+.mut{color:var(--mut)}.sm{font-size:13px}
+.btn{padding:8px 13px;border-radius:10px;background:var(--acc);color:#fff;font-weight:600}
+.btn.g{background:var(--soft);color:var(--ink)}.btn.l{background:none;border:1px solid var(--line);color:var(--ink)}.btn.d{background:none;border:1px solid color-mix(in srgb,var(--bad) 45%,transparent);color:var(--bad)}
+.btn.s{padding:5px 10px;font-size:13px;border-radius:8px}
+.btn:disabled{opacity:.5}
+input,select,textarea{padding:9px 11px;border-radius:10px;border:1px solid var(--line);background:var(--bg);outline:none;max-width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--acc)}
+label.f{display:block;font-size:12.5px;color:var(--mut);margin-bottom:10px}
+label.f input,label.f select,label.f textarea{display:block;width:100%;margin-top:4px;color:var(--ink);font-size:14.5px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0 12px}
+.tag{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--mut);font-weight:500;white-space:nowrap}
+.tag.w{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}.tag.g{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}.tag.b{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c,var(--acc));margin-right:6px}
+.cls{border-left:4px solid var(--c,var(--acc))}
+.cls .hd{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.cls .t{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums}
+.ros{margin-top:10px;border-top:1px solid var(--line)}
+.ros .p{display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.ros .p:last-child{border-bottom:0}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:600;padding:6px 8px}
+td{padding:9px 8px;border-top:1px solid var(--line);vertical-align:middle}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.tw{overflow-x:auto}
+.wk{display:grid;grid-template-columns:repeat(7,minmax(128px,1fr));gap:8px;overflow-x:auto;padding-bottom:6px}
+.wk h4{margin:0 0 6px;font-size:13px;text-transform:capitalize}
+.sl{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:7px 9px;margin-bottom:6px;font-size:13px}
+.sl b{display:block;font-variant-numeric:tabular-nums}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:20;display:none;align-items:center;justify-content:center;padding:14px}
+.ov.on{display:flex}
+.dlg{background:var(--card);border-radius:18px;padding:18px;width:100%;max-width:460px;max-height:92dvh;overflow-y:auto}
+.dlg h2{font-size:19px}
+.err{color:var(--bad);font-size:13.5px;min-height:1.2em;margin:4px 0 8px}
+.login{max-width:400px;margin:8vh auto;padding:0 16px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:10px 15px;border-radius:12px;font-weight:500;opacity:0;transition:.2s;z-index:40;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+code{background:var(--soft);padding:2px 6px;border-radius:6px;font-size:12.5px;word-break:break-all}
+.empty{padding:26px;text-align:center;color:var(--mut);border:1px dashed var(--line);border-radius:var(--r)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="ov" id="ov"><div class="dlg" id="dlg"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+'use strict';
+var T=null;try{T=localStorage.getItem('hc_admin')}catch(e){}
+var S={tab:'hoy',studio:null,cat:null,date:null,day:null,pend:null,students:null,q:''};
+var $=function(id){return document.getElementById(id)},R=$('root');
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function api(m,p,b){return fetch('/api'+p,{method:m,headers:Object.assign({'Content-Type':'application/json'},T?{Authorization:'Bearer '+T}:{}),body:b?JSON.stringify(b):undefined}).then(function(r){return r.json().catch(function(){return{ok:false,error:'Sin respuesta.'}}).then(function(j){if(r.status===401&&j.code==='login'){T=null;try{localStorage.removeItem('hc_admin')}catch(e){}vLogin()}return j})}).catch(function(){return{ok:false,error:'No hay conexión.'}})}
+function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on')},3000)}
+var DN=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'],MN=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+function pd(f){var a=f.split('-').map(Number);return new Date(Date.UTC(a[0],a[1]-1,a[2]))}
+function add(f,n){var d=pd(f);d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)}
+function largo(f){var d=pd(f);return DN[d.getUTCDay()]+' '+d.getUTCDate()+' de '+MN[d.getUTCMonth()]}
+function money(n){return (S.studio?S.studio.currency:'Bs')+' '+(Number(n)%1?Number(n).toFixed(2):Number(n))}
+function fecha(ts){var d=new Date(new Date(ts).getTime()+S.studio.tz_offset_min*60000);return d.getUTCDate()+' '+MN[d.getUTCMonth()]+' '+d.getUTCFullYear()}
+function open(h){$('dlg').innerHTML=h;$('ov').classList.add('on')}
+function close(){$('ov').classList.remove('on')}
+$('ov').addEventListener('click',function(e){if(e.target===this)close()});
+function err(t){var e=$('dlg').querySelector('.err');if(e)e.textContent=t||''}
+function val(id){var e=$(id);return e?e.value:undefined}
+
+// ── acceso ──
+function vLogin(alta){
+  R.innerHTML='<div class="login"><h2>'+(alta?'Crear mi estudio':'Panel del estudio')+'</h2><div class="card">'
+    +(alta?'<label class="f">Nombre del estudio<input id="aN"></label><label class="f">Dirección web (solo minúsculas y guiones)<input id="aS" placeholder="mi-estudio"></label>':'')
+    +'<label class="f">Correo<input id="aE" type="email" autocomplete="username"></label><label class="f">Contraseña<input id="aP" type="password" autocomplete="'+(alta?'new-password':'current-password')+'"></label>'
+    +(alta?'<label class="f">Clave de alta (si te dieron una)<input id="aK"></label>':'')
+    +'<div class="err" id="aErr"></div><button class="btn" id="aGo" style="width:100%">'+(alta?'Crear estudio':'Entrar')+'</button></div>'
+    +'<p class="mut sm" style="text-align:center"><a href="#" id="aSw" style="color:inherit">'+(alta?'Ya tengo un estudio: entrar':'¿Estudio nuevo? Crealo acá')+'</a></p></div>';
+  $('aSw').onclick=function(e){e.preventDefault();vLogin(!alta)};
+  $('aGo').onclick=function(){var b=this;b.disabled=true;
+    (alta?api('POST','/studios',{name:val('aN'),slug:val('aS'),email:val('aE'),password:val('aP'),setup_key:val('aK')}):api('POST','/admin/login',{email:val('aE'),password:val('aP')})).then(function(r){b.disabled=false;
+      if(!r.ok)return void($('aErr').textContent=r.error);T=r.token;try{localStorage.setItem('hc_admin',T)}catch(e){}boot()})};
+}
+function boot(){Promise.all([api('GET','/admin/studio'),api('GET','/admin/catalog'),api('GET','/admin/pending')]).then(function(a){if(!a[0].ok)return;S.studio=a[0].studio;S.cat=a[1];S.pend=a[2];document.documentElement.style.setProperty('--acc',S.studio.color);go(S.tab)})}
+function reCat(){return api('GET','/admin/catalog').then(function(r){if(r.ok)S.cat=r})}
+function rePend(){return api('GET','/admin/pending').then(function(r){if(r.ok)S.pend=r})}
+
+var TABS=[['hoy','Clases del día'],['pagos','Pagos por verificar'],['horario','Horario semanal'],['catalogo','Disciplinas y paquetes'],['alumnos','Alumnos'],['ajustes','Ajustes']];
+function shell(body){
+  var np=S.pend?(S.pend.packages.length+S.pend.singles.length):0;
+  R.innerHTML='<div class="shell"><aside><h1>'+esc(S.studio.name)+'<small>Panel del estudio</small></h1>'+TABS.map(function(t){return '<button data-tab="'+t[0]+'" class="'+(S.tab===t[0]?'on':'')+'">'+t[1]+(t[0]==='pagos'&&np?'<span class="n">'+np+'</span>':'')+'</button>'}).join('')
+    +'<div class="sp"></div><a href="/e/'+esc(S.studio.slug)+'" target="_blank" rel="noopener">Ver página pública ↗</a><a href="#" id="out">Cerrar sesión</a></aside><main>'+body+'</main></div>';
+}
+function go(tab){S.tab=tab;({hoy:vHoy,pagos:vPagos,horario:vHorario,catalogo:vCat,alumnos:vAlumnos,ajustes:vAjustes})[tab]()}
+
+// ── clases del día ──
+var EST={booked:['reservada',''],waitlist:['lista de espera','w'],attended:['asistió','g'],no_show:['no vino','b'],late_cancel:['canceló tarde','b']};
+var PAY={package:'paquete',single_pending:'suelta · por verificar',single_paid:'suelta pagada',courtesy:'cortesía'};
+function vHoy(){
+  api('GET','/admin/day'+(S.date?'?date='+S.date:'')).then(function(r){if(!r.ok)return;S.day=r;S.date=r.date;
+    var h='<div class="row" style="margin-bottom:14px"><h2 class="grow" style="margin:0;text-transform:capitalize">'+largo(r.date)+(r.date===r.today?' · hoy':'')+'</h2><button class="btn l" id="dP">‹</button><input type="date" id="dD" value="'+r.date+'"><button class="btn l" id="dN">›</button></div>';
+    h+=r.sessions.length?r.sessions.map(function(c){
+      return '<div class="card cls" style="--c:'+esc(c.color)+(c.cancelled?';opacity:.55':'')+'"><div class="hd"><span class="t">'+c.time+'</span><div class="grow"><b>'+esc(c.discipline)+'</b><div class="mut sm">'+esc([c.instructor,c.room,c.duration_min+' min'].filter(Boolean).join(' · '))+'</div></div>'
+        +(c.cancelled?'<span class="tag b">cancelada</span>':'<span class="tag'+(c.free===0?' b':c.free<=3?' w':'')+'">'+c.booked+' / '+c.capacity+'</span><button class="btn s g" data-addto="'+c.id+'">+ Anotar</button><button class="btn s d" data-cancelc="'+c.id+'">Cancelar clase</button>')+'</div>'
+        +(c.roster.length?'<div class="ros">'+c.roster.map(function(p){var e=EST[p.status]||[p.status,''];
+          return '<div class="p"><div class="grow"><b>'+esc(p.name)+'</b> <span class="mut sm">'+esc(p.phone)+' · '+(PAY[p.pay]||p.pay)+(p.source!=='web'?' · '+p.source:'')+'</span></div><span class="tag '+e[1]+'">'+e[0]+'</span>'
+            +(['booked','attended','no_show'].indexOf(p.status)>=0?'<button class="btn s '+(p.status==='attended'?'':'g')+'" data-att="'+p.id+'" data-v="'+(p.status==='attended'?'booked':'attended')+'">✓ Asistió</button><button class="btn s g" data-att="'+p.id+'" data-v="'+(p.status==='no_show'?'booked':'no_show')+'">No vino</button>':'')
+            +(['booked','waitlist'].indexOf(p.status)>=0?'<button class="btn s d" data-bcancel="'+p.id+'">Quitar</button>':'')+'</div>'}).join('')+'</div>':'')+'</div>'}).join(''):'<div class="empty">No hay clases este día. Armá el horario en «Horario semanal».</div>';
+    shell(h);
+    $('dP').onclick=function(){S.date=add(r.date,-1);vHoy()};$('dN').onclick=function(){S.date=add(r.date,1);vHoy()};$('dD').onchange=function(){S.date=this.value;vHoy()};
+  });
+}
+function addToClass(id){
+  open('<h2>Anotar a un alumno</h2><label class="f">WhatsApp (con código de país)<input id="xP" inputmode="tel"></label><label class="f">Nombre (si es nuevo)<input id="xN"></label><label class="f">Cómo paga<select id="xM"><option value="package">Con su paquete</option><option value="courtesy">Cortesía (no descuenta)</option></select></label><div class="err"></div><div class="row"><button class="btn" id="xGo">Anotar</button><button class="btn g" id="xNo">Cerrar</button></div>');
+  $('xNo').onclick=close;
+  $('xGo').onclick=function(){api('POST','/admin/bookings',{session_id:id,phone:val('xP'),name:val('xN'),pay:val('xM')}).then(function(r){if(!r.ok){if(r.code==='llena')return api('POST','/admin/bookings',{session_id:id,phone:val('xP'),name:val('xN'),pay:val('xM'),waitlist:true}).then(function(r2){if(!r2.ok)return err(r2.error);close();toast('Clase llena: quedó en lista de espera');vHoy()});return err(r.error)}close();toast('Anotado');vHoy()})};
+}
+
+// ── pagos ──
+function vPagos(){rePend().then(function(){var p=S.pend,h='<h2>Pagos por verificar</h2>';
+  if(!p.packages.length&&!p.singles.length)h+='<div class="empty">No hay comprobantes esperando.</div>';
+  h+=p.packages.map(function(x){return '<div class="card"><div class="row"><div class="grow"><b>'+esc(x.student)+'</b> <span class="mut sm">'+esc(x.phone)+'</span><div>Paquete «'+esc(x.name)+'» · '+x.sessions_total+' sesiones · '+(x.price!=null?money(x.price):'')+'</div></div>'+(x.receipt_id?'<button class="btn s l" data-rec="'+x.receipt_id+'">Ver comprobante</button>':'')+'<button class="btn s" data-sp="'+x.id+'" data-a="approve">Aprobar</button><button class="btn s d" data-sp="'+x.id+'" data-a="reject">Rechazar</button></div></div>'}).join('');
+  h+=p.singles.map(function(x){return '<div class="card"><div class="row"><div class="grow"><b>'+esc(x.student)+'</b> <span class="mut sm">'+esc(x.phone)+'</span><div>Clase suelta · '+esc(x.discipline)+' · '+largo(x.date)+' '+x.time+'</div></div>'+(x.receipt_id?'<button class="btn s l" data-rec="'+x.receipt_id+'">Ver comprobante</button>':'')+'<button class="btn s" data-bk="'+x.id+'" data-a="approve">Aprobar</button><button class="btn s d" data-bk="'+x.id+'" data-a="reject">Rechazar</button></div></div>'}).join('');
+  shell(h)})}
+function verRec(id){fetch('/api/admin/receipts/'+id,{headers:{Authorization:'Bearer '+T}}).then(function(r){return r.blob()}).then(function(b){var u=URL.createObjectURL(b);open('<h2>Comprobante</h2>'+(b.type==='application/pdf'?'<p><a href="'+u+'" target="_blank" rel="noopener">Abrir el PDF ↗</a></p>':'<img src="'+u+'" style="max-width:100%;border-radius:10px" alt="Comprobante">')+'<div style="margin-top:12px"><button class="btn g" onclick="document.getElementById(\'ov\').classList.remove(\'on\')">Cerrar</button></div>')})}
+
+// ── horario semanal ──
+function vHorario(){var c=S.cat,dn={};c.disciplines.forEach(function(d){dn[d.id]=d});
+  var h='<div class="row" style="margin-bottom:14px"><h2 class="grow" style="margin:0">Horario semanal</h2><button class="btn" data-slot="new"'+(c.disciplines.length?'':' disabled')+'>+ Agregar clase</button></div><p class="mut sm">Es la plantilla que se repite cada semana. Las clases que ya tienen reservas conservan su hora aunque la cambies acá.</p>';
+  h+='<div class="wk">'+[1,2,3,4,5,6,0].map(function(d){var l=c.slots.filter(function(s){return s.dow===d});
+    return '<div><h4>'+DN[d]+'</h4>'+(l.length?l.map(function(s){var x=dn[s.discipline_id]||{};return '<button class="sl" style="--c:'+esc(x.color||'#888')+'" data-slot="'+s.id+'"><b>'+s.start_time+'</b>'+esc(x.name||'')+'<div class="mut">'+esc(s.instructor||'')+' · '+s.capacity+' lug.</div></button>'}).join(''):'<div class="mut sm">—</div>')+'</div>'}).join('')+'</div>';
+  shell(h)}
+function slotDlg(id){var c=S.cat,s=id==='new'?{dow:1,start_time:'08:00',duration_min:60,capacity:12}:c.slots.filter(function(x){return x.id===Number(id)})[0];if(!s)return;
+  open('<h2>'+(id==='new'?'Nueva clase':'Editar clase')+'</h2><div class="g2"><label class="f">Disciplina<select id="sD">'+c.disciplines.filter(function(d){return d.active}).map(function(d){return '<option value="'+d.id+'"'+(d.id===s.discipline_id?' selected':'')+'>'+esc(d.name)+'</option>'}).join('')+'</select></label>'
+    +'<label class="f">Día<select id="sW">'+[1,2,3,4,5,6,0].map(function(d){return '<option value="'+d+'"'+(d===s.dow?' selected':'')+'>'+DN[d]+'</option>'}).join('')+'</select></label>'
+    +'<label class="f">Hora<input id="sT" type="time" value="'+s.start_time+'"></label><label class="f">Duración (min)<input id="sU" type="number" min="10" value="'+s.duration_min+'"></label>'
+    +'<label class="f">Cupo<input id="sC" type="number" min="1" value="'+s.capacity+'"></label><label class="f">Profe<input id="sI" value="'+esc(s.instructor||'')+'"></label><label class="f">Sala<input id="sR" value="'+esc(s.room||'')+'"></label></div>'
+    +(id==='new'?'<label class="f sm"><input type="checkbox" id="sL" style="display:inline;width:auto;margin-right:6px">Repetir de lunes a viernes</label>':'')
+    +'<div class="err"></div><div class="row"><button class="btn" id="sGo">Guardar</button>'+(id==='new'?'':'<button class="btn d" id="sDel">Quitar del horario</button>')+'<button class="btn g" id="sNo">Cerrar</button></div>');
+  $('sNo').onclick=close;
+  var body=function(dow){return{discipline_id:Number(val('sD')),dow:dow,start_time:val('sT'),duration_min:val('sU'),capacity:val('sC'),instructor:val('sI'),room:val('sR')}};
+  $('sGo').onclick=function(){var b=this;b.disabled=true;var dias=id==='new'&&$('sL').checked?[1,2,3,4,5]:[Number(val('sW'))];
+    Promise.all(dias.map(function(d){return id==='new'?api('POST','/admin/slots',body(d)):api('PUT','/admin/slots/'+id,body(d))})).then(function(rs){b.disabled=false;var bad=rs.filter(function(r){return !r.ok})[0];if(bad)return err(bad.error);close();reCat().then(vHorario);toast('Horario guardado')})};
+  if($('sDel'))$('sDel').onclick=function(){api('DELETE','/admin/slots/'+id).then(function(){close();reCat().then(vHorario);toast('Quitada del horario')})};
+}
+
+// ── disciplinas y paquetes ──
+function vCat(){var c=S.cat;
+  var h='<div class="row"><h2 class="grow" style="margin:0">Disciplinas</h2><button class="btn" data-disc="new">+ Disciplina</button></div><div class="card tw" style="margin-top:12px"><table><tr><th>Nombre</th><th>Descripción</th><th></th></tr>'
+    +(c.disciplines.map(function(d){return '<tr'+(d.active?'':' style="opacity:.5"')+'><td><span class="dot" style="--c:'+esc(d.color)+'"></span><b>'+esc(d.name)+'</b></td><td class="mut sm">'+esc(d.description||'')+'</td><td class="num"><button class="btn s l" data-disc="'+d.id+'">Editar</button></td></tr>'}).join('')||'<tr><td colspan="3" class="mut">Todavía no hay disciplinas.</td></tr>')+'</table></div>';
+  h+='<div class="row" style="margin-top:26px"><h2 class="grow" style="margin:0">Paquetes</h2><button class="btn" data-pack="new">+ Paquete</button></div><div class="card tw" style="margin-top:12px"><table><tr><th>Nombre</th><th class="num">Sesiones</th><th class="num">Precio</th><th class="num">Vigencia</th><th></th></tr>'
+    +(c.packages.map(function(p){return '<tr'+(p.active?'':' style="opacity:.5"')+'><td><b>'+esc(p.name)+'</b></td><td class="num">'+p.sessions+'</td><td class="num">'+money(p.price)+'</td><td class="num">'+p.valid_days+' días</td><td class="num"><button class="btn s l" data-pack="'+p.id+'">Editar</button></td></tr>'}).join('')||'<tr><td colspan="5" class="mut">Todavía no hay paquetes.</td></tr>')+'</table></div>';
+  shell(h)}
+function discDlg(id){var d=id==='new'?{name:'',color:S.studio.color,description:'',active:true}:S.cat.disciplines.filter(function(x){return x.id===Number(id)})[0];
+  open('<h2>'+(id==='new'?'Nueva disciplina':'Editar disciplina')+'</h2><label class="f">Nombre<input id="dN" value="'+esc(d.name)+'"></label><label class="f">Color<input id="dC" type="color" value="'+esc(d.color)+'" style="height:40px;padding:3px"></label><label class="f">Descripción corta<input id="dX" value="'+esc(d.description||'')+'"></label>'+(id==='new'?'':'<label class="f sm"><input type="checkbox" id="dA" style="display:inline;width:auto;margin-right:6px"'+(d.active?' checked':'')+'>Activa (se muestra en el horario)</label>')+'<div class="err"></div><div class="row"><button class="btn" id="dGo">Guardar</button><button class="btn g" id="dNo">Cerrar</button></div>');
+  $('dNo').onclick=close;$('dGo').onclick=function(){var b={name:val('dN'),color:val('dC'),description:val('dX')};if(id!=='new')b.active=$('dA').checked;(id==='new'?api('POST','/admin/disciplines',b):api('PUT','/admin/disciplines/'+id,b)).then(function(r){if(!r.ok)return err(r.error);close();reCat().then(vCat)})}}
+function packDlg(id){var p=id==='new'?{name:'',sessions:8,price:0,valid_days:50,active:true}:S.cat.packages.filter(function(x){return x.id===Number(id)})[0];
+  open('<h2>'+(id==='new'?'Nuevo paquete':'Editar paquete')+'</h2><label class="f">Nombre<input id="pN" value="'+esc(p.name)+'" placeholder="8 sesiones"></label><div class="g2"><label class="f">Sesiones<input id="pS" type="number" min="1" value="'+p.sessions+'"></label><label class="f">Precio<input id="pP" type="number" min="0" step="0.01" value="'+p.price+'"></label><label class="f">Vigencia (días)<input id="pV" type="number" min="1" value="'+p.valid_days+'"></label></div>'+(id==='new'?'':'<label class="f sm"><input type="checkbox" id="pA" style="display:inline;width:auto;margin-right:6px"'+(p.active?' checked':'')+'>A la venta</label>')+'<p class="mut sm">Cambiar un paquete no modifica los que ya compraron tus alumnos.</p><div class="err"></div><div class="row"><button class="btn" id="pGo">Guardar</button><button class="btn g" id="pNo">Cerrar</button></div>');
+  $('pNo').onclick=close;$('pGo').onclick=function(){var b={name:val('pN'),sessions:val('pS'),price:val('pP'),valid_days:val('pV')};if(id!=='new')b.active=$('pA').checked;(id==='new'?api('POST','/admin/packages',b):api('PUT','/admin/packages/'+id,b)).then(function(r){if(!r.ok)return err(r.error);close();reCat().then(vCat)})}}
+
+// ── alumnos ──
+function vAlumnos(){api('GET','/admin/students?q='+encodeURIComponent(S.q)).then(function(r){if(!r.ok)return;
+  var h='<div class="row" style="margin-bottom:12px"><h2 class="grow" style="margin:0">Alumnos</h2><input id="aQ" placeholder="Buscar por nombre o número" value="'+esc(S.q)+'"><button class="btn" id="aNew">+ Alumno</button></div><div class="card tw"><table><tr><th>Alumno</th><th class="num">Sesiones</th><th>Vence</th><th class="num">Reservas</th></tr>'
+    +(r.students.map(function(s){return '<tr data-st="'+s.id+'" style="cursor:pointer"><td><b>'+esc(s.name)+'</b><div class="mut sm">'+esc(s.phone)+'</div></td><td class="num"><b>'+s.credits+'</b></td><td class="sm">'+(s.next_expiry?fecha(s.next_expiry):'<span class="mut">—</span>')+'</td><td class="num">'+s.upcoming+'</td></tr>'}).join('')||'<tr><td colspan="4" class="mut">Sin alumnos todavía.</td></tr>')+'</table></div>';
+  shell(h);var t;$('aQ').oninput=function(){var v=this.value;clearTimeout(t);t=setTimeout(function(){S.q=v;vAlumnos()},350)};if(S.q){$('aQ').focus();$('aQ').setSelectionRange(S.q.length,S.q.length)}
+  $('aNew').onclick=function(){open('<h2>Nuevo alumno</h2><label class="f">Nombre y apellido<input id="nN"></label><label class="f">WhatsApp (con código de país)<input id="nP" inputmode="tel"></label><div class="err"></div><div class="row"><button class="btn" id="nGo">Crear</button><button class="btn g" id="nNo">Cerrar</button></div>');$('nNo').onclick=close;$('nGo').onclick=function(){api('POST','/admin/students',{name:val('nN'),phone:val('nP')}).then(function(x){if(!x.ok)return err(x.error);alumnoDlg(x.student.id)})}};
+})}
+function alumnoDlg(id){api('GET','/admin/students/'+id).then(function(r){if(!r.ok)return;var st=r.student;
+  var h='<h2>'+esc(st.name)+'</h2><p class="mut" style="margin-top:-8px">'+esc(st.phone)+' · '+r.credits+' sesiones disponibles</p><h3>Paquetes</h3>'
+    +(r.packages.map(function(p){return '<div class="row sm" style="padding:6px 0;border-bottom:1px solid var(--line)"><div class="grow"><b>'+esc(p.name)+'</b> · '+p.remaining+' de '+p.total+'<div class="mut">'+(p.expired?'venció el ':'vence el ')+fecha(p.expires_at)+'</div></div><span class="tag '+(p.status==='pending'?'w':p.expired?'b':'g')+'">'+(p.status==='pending'?'por verificar':p.expired?'vencido':'activo')+'</span><button class="btn s l" data-adj="'+p.id+'" data-t="'+p.total+'" data-e="'+p.expires_at+'">Ajustar</button></div>'}).join('')||'<p class="mut sm">Sin paquetes.</p>')
+    +'<div class="row" style="margin-top:10px"><select id="vP" class="grow">'+S.cat.packages.filter(function(p){return p.active}).map(function(p){return '<option value="'+p.id+'">'+esc(p.name)+' · '+money(p.price)+'</option>'}).join('')+'</select><button class="btn" id="vGo">Vender</button></div>'
+    +'<h3>Próximas clases</h3>'+(r.upcoming.map(function(b){return '<div class="row sm" style="padding:5px 0"><div class="grow"><b>'+esc(b.discipline)+'</b> · '+largo(b.date)+' '+b.time+'</div><span class="tag'+(b.status==='waitlist'?' w':'')+'">'+(b.status==='waitlist'?'lista de espera':'reservada')+'</span></div>'}).join('')||'<p class="mut sm">Sin reservas.</p>')
+    +'<div class="err"></div><div class="row" style="margin-top:14px"><button class="btn l s" id="rPin">Restablecer PIN</button><span class="grow"></span><button class="btn g" id="aNo">Cerrar</button></div>';
+  open(h);$('aNo').onclick=function(){close();if(S.tab==='alumnos')vAlumnos()};
+  $('vGo').onclick=function(){api('POST','/admin/students/'+id+'/packages',{package_id:Number(val('vP'))}).then(function(x){if(!x.ok)return err(x.error);toast('Paquete activado');alumnoDlg(id)})};
+  $('rPin').onclick=function(){api('PUT','/admin/students/'+id,{reset_pin:true}).then(function(){toast('PIN borrado: el alumno elige uno nuevo al entrar')})};
+  [].forEach.call($('dlg').querySelectorAll('[data-adj]'),function(b){b.onclick=function(){var t=prompt('Sesiones totales del paquete:',b.dataset.t);if(t===null)return;var e=prompt('Vence el (AAAA-MM-DD):',b.dataset.e.slice(0,10));if(e===null)return;api('PATCH','/admin/student-packages/'+b.dataset.adj,{sessions_total:Number(t),expires_at:e+'T23:59:00'+(S.studio.tz_offset_min<0?'-':'+')+String(Math.abs(S.studio.tz_offset_min)/60).padStart(2,'0')+':00'}).then(function(x){if(!x.ok)return err(x.error);alumnoDlg(id)})}});
+})}
+
+// ── ajustes ──
+function vAjustes(){var s=S.studio,url=location.origin+'/e/'+s.slug;
+  var h='<h2>Ajustes</h2><div class="card"><p style="margin-top:0">Tu página pública: <a href="'+esc(url)+'" target="_blank" rel="noopener">'+esc(url)+'</a></p><div class="g2">'
+    +'<label class="f">Nombre del estudio<input id="jN" value="'+esc(s.name)+'"></label><label class="f">Color<input id="jC" type="color" value="'+esc(s.color)+'" style="height:40px;padding:3px"></label>'
+    +'<label class="f">Dirección<input id="jA" value="'+esc(s.address||'')+'"></label><label class="f">WhatsApp de contacto<input id="jW" value="'+esc(s.whatsapp||'')+'"></label></div>'
+    +'<label class="f">Presentación (una o dos líneas)<textarea id="jI" rows="2">'+esc(s.intro||'')+'</textarea></label></div>'
+    +'<h3>Reglas</h3><div class="card"><div class="g2"><label class="f">Cancelación sin descuento hasta (horas antes)<input id="jH" type="number" min="0" value="'+s.cancel_hours+'"></label><label class="f">Se puede reservar con (días de anticipación)<input id="jD" type="number" min="1" value="'+s.days_ahead+'"></label>'
+    +'<label class="f">Precio de la clase suelta (vacío = no se vende)<input id="jS" type="number" min="0" step="0.01" value="'+(s.single_price==null?'':s.single_price)+'"></label><label class="f">Moneda<input id="jM" value="'+esc(s.currency)+'"></label></div></div>'
+    +'<h3>Cobro por QR</h3><div class="card"><div class="row" style="align-items:flex-start">'+(s.qr_image?'<img src="'+esc(s.qr_image)+'" alt="QR" style="width:120px;border-radius:10px;background:#fff">':'<div class="mut sm" style="width:120px">Sin QR cargado</div>')+'<div class="grow"><label class="f">Imagen del QR (hasta 1 MB)<input id="jQ" type="file" accept="image/png,image/jpeg,image/webp"></label><label class="f">A nombre de<input id="jT" value="'+esc(s.qr_holder||'')+'"></label></div></div></div>'
+    +'<div class="err" id="jErr"></div><button class="btn" id="jGo">Guardar ajustes</button>'
+    +'<h3>Conexión con otros sistemas</h3><div class="card"><p class="sm" style="margin-top:0">Clave para que un sistema externo (por ejemplo Aitana por WhatsApp) consulte el horario, reserve y cancele en nombre de tus alumnos. Tratala como una contraseña.</p><p><code id="jK">••••••••••••</code></p><div class="row"><button class="btn s l" id="jKs">Mostrar</button><button class="btn s d" id="jKr">Generar una nueva</button></div></div>';
+  shell(h);
+  $('jKs').onclick=function(){$('jK').textContent=s.integration_key};
+  $('jKr').onclick=function(){if(!confirm('La clave actual deja de funcionar. ¿Generar una nueva?'))return;api('PUT','/admin/studio',{rotate_integration_key:true}).then(function(){api('GET','/admin/studio').then(function(r){S.studio=r.studio;vAjustes();toast('Clave nueva generada')})})};
+  $('jGo').onclick=function(){var b={name:val('jN'),color:val('jC'),address:val('jA'),whatsapp:val('jW'),intro:val('jI'),cancel_hours:val('jH'),days_ahead:val('jD'),single_price:val('jS')===''?null:val('jS'),currency:val('jM'),qr_holder:val('jT')};
+    var f=$('jQ').files[0],p=f?new Promise(function(ok){var r=new FileReader();r.onload=function(){b.qr_image=r.result;ok()};r.readAsDataURL(f)}):Promise.resolve();
+    p.then(function(){return api('PUT','/admin/studio',b)}).then(function(r){if(!r.ok)return void($('jErr').textContent=r.error);api('GET','/admin/studio').then(function(x){S.studio=x.studio;document.documentElement.style.setProperty('--acc',S.studio.color);vAjustes();toast('Ajustes guardados')})})};
+}
+
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-tab],[data-addto],[data-cancelc],[data-att],[data-bcancel],[data-rec],[data-sp],[data-bk],[data-slot],[data-disc],[data-pack],[data-st],#out');if(!t)return;
+  if(t.dataset.tab)go(t.dataset.tab);
+  else if(t.dataset.addto)addToClass(Number(t.dataset.addto));
+  else if(t.dataset.cancelc){if(confirm('Se cancela la clase y se devuelven las sesiones a todos los anotados. ¿Seguir?'))api('POST','/admin/sessions/'+t.dataset.cancelc+'/cancel').then(function(r){toast(r.ok?'Clase cancelada · '+r.cancelled+' reserva(s) devueltas':r.error);vHoy()})}
+  else if(t.dataset.att)api('PATCH','/admin/bookings/'+t.dataset.att,{status:t.dataset.v}).then(function(r){if(!r.ok)toast(r.error);vHoy()});
+  else if(t.dataset.bcancel){var dev=confirm('¿Devolver la sesión al paquete del alumno?\n\nAceptar = se devuelve · Cancelar = se descuenta');api('PATCH','/admin/bookings/'+t.dataset.bcancel,{action:'cancel',refund:dev}).then(function(r){toast(r.ok?'Reserva quitada':r.error);vHoy()})}
+  else if(t.dataset.rec)verRec(t.dataset.rec);
+  else if(t.dataset.sp)api('PATCH','/admin/student-packages/'+t.dataset.sp,{action:t.dataset.a}).then(function(r){toast(r.ok?(t.dataset.a==='approve'?'Paquete aprobado':'Rechazado · '+r.cancelled_bookings+' reserva(s) canceladas'):r.error);vPagos()});
+  else if(t.dataset.bk)api('PATCH','/admin/bookings/'+t.dataset.bk,{action:t.dataset.a}).then(function(r){toast(r.ok?(t.dataset.a==='approve'?'Pago aprobado':'Rechazado: se liberó el lugar'):r.error);vPagos()});
+  else if(t.dataset.slot)slotDlg(t.dataset.slot);
+  else if(t.dataset.disc)discDlg(t.dataset.disc);
+  else if(t.dataset.pack)packDlg(t.dataset.pack);
+  else if(t.dataset.st)alumnoDlg(Number(t.dataset.st));
+  else if(t.id==='out'){e.preventDefault();T=null;try{localStorage.removeItem('hc_admin')}catch(x){}vLogin()}
+});
+if(T)boot();else vLogin();
+})();
+</script>
+</body>
+</html>
