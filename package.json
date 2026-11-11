@@ -1,6 +1,6 @@
 {
   "name": "web-horarios-clases",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Horarios y reservas de clases por sesiones: paquetes, cupos, cancelación y lista de espera",
   "main": "server.js",
   "scripts": {

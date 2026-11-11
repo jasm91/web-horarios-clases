@@ -181,7 +181,8 @@ main.in>*{animation:up .32s cubic-bezier(.2,.8,.2,1) both}
 <script>
 (function(){
 'use strict';
-var slug=decodeURIComponent(location.pathname.split('/')[2]||''),API='/api/s/'+encodeURIComponent(slug),LS='hc_'+slug;
+var BASE=location.pathname.indexOf('/clases/')===0?'/clases':'';
+var slug=decodeURIComponent(location.pathname.slice(BASE.length).split('/')[2]||''),API=BASE+'/api/s/'+encodeURIComponent(slug),LS='hc_'+slug;
 var S={tab:'horario',info:null,from:null,day:null,sessions:[],disc:0,me:null,token:null};
 try{S.token=localStorage.getItem(LS)}catch(e){}
 var $=function(id){return document.getElementById(id)};

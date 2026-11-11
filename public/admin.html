@@ -80,7 +80,8 @@ var T=null;try{T=localStorage.getItem('hc_admin')}catch(e){}
 var S={tab:'hoy',studio:null,cat:null,date:null,day:null,pend:null,students:null,q:''};
 var $=function(id){return document.getElementById(id)},R=$('root');
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function api(m,p,b){return fetch('/api'+p,{method:m,headers:Object.assign({'Content-Type':'application/json'},T?{Authorization:'Bearer '+T}:{}),body:b?JSON.stringify(b):undefined}).then(function(r){return r.json().catch(function(){return{ok:false,error:'Sin respuesta.'}}).then(function(j){if(r.status===401&&j.code==='login'){T=null;try{localStorage.removeItem('hc_admin')}catch(e){}vLogin()}return j})}).catch(function(){return{ok:false,error:'No hay conexión.'}})}
+var BASE=location.pathname.indexOf('/clases/')===0?'/clases':'';
+function api(m,p,b){return fetch(BASE+'/api'+p,{method:m,headers:Object.assign({'Content-Type':'application/json'},T?{Authorization:'Bearer '+T}:{}),body:b?JSON.stringify(b):undefined}).then(function(r){return r.json().catch(function(){return{ok:false,error:'Sin respuesta.'}}).then(function(j){if(r.status===401&&j.code==='login'){T=null;try{localStorage.removeItem('hc_admin')}catch(e){}vLogin()}return j})}).catch(function(){return{ok:false,error:'No hay conexión.'}})}
 function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on')},3000)}
 var DN=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'],MN=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 function pd(f){var a=f.split('-').map(Number);return new Date(Date.UTC(a[0],a[1]-1,a[2]))}
@@ -115,7 +116,7 @@ var TABS=[['hoy','Clases del día'],['pagos','Pagos por verificar'],['horario','
 function shell(body){
   var np=S.pend?(S.pend.packages.length+S.pend.singles.length):0;
   R.innerHTML='<div class="shell"><aside><h1>'+esc(S.studio.name)+'<small>Panel del estudio</small></h1>'+TABS.map(function(t){return '<button data-tab="'+t[0]+'" class="'+(S.tab===t[0]?'on':'')+'">'+t[1]+(t[0]==='pagos'&&np?'<span class="n">'+np+'</span>':'')+'</button>'}).join('')
-    +'<div class="sp"></div><a href="/e/'+esc(S.studio.slug)+'" target="_blank" rel="noopener">Ver página pública ↗</a><a href="#" id="out">Cerrar sesión</a></aside><main>'+body+'</main></div>';
+    +'<div class="sp"></div><a href="'+BASE+'/e/'+esc(S.studio.slug)+'" target="_blank" rel="noopener">Ver página pública ↗</a><a href="#" id="out">Cerrar sesión</a></aside><main>'+body+'</main></div>';
 }
 function go(tab){S.tab=tab;({hoy:vHoy,pagos:vPagos,horario:vHorario,catalogo:vCat,alumnos:vAlumnos,ajustes:vAjustes})[tab]()}
 
@@ -148,7 +149,7 @@ function vPagos(){rePend().then(function(){var p=S.pend,h='<h2>Pagos por verific
   h+=p.packages.map(function(x){return '<div class="card"><div class="row"><div class="grow"><b>'+esc(x.student)+'</b> <span class="mut sm">'+esc(x.phone)+'</span><div>Paquete «'+esc(x.name)+'» · '+x.sessions_total+' sesiones · '+(x.price!=null?money(x.price):'')+'</div></div>'+(x.receipt_id?'<button class="btn s l" data-rec="'+x.receipt_id+'">Ver comprobante</button>':'')+'<button class="btn s" data-sp="'+x.id+'" data-a="approve">Aprobar</button><button class="btn s d" data-sp="'+x.id+'" data-a="reject">Rechazar</button></div></div>'}).join('');
   h+=p.singles.map(function(x){return '<div class="card"><div class="row"><div class="grow"><b>'+esc(x.student)+'</b> <span class="mut sm">'+esc(x.phone)+'</span><div>Clase suelta · '+esc(x.discipline)+' · '+largo(x.date)+' '+x.time+'</div></div>'+(x.receipt_id?'<button class="btn s l" data-rec="'+x.receipt_id+'">Ver comprobante</button>':'')+'<button class="btn s" data-bk="'+x.id+'" data-a="approve">Aprobar</button><button class="btn s d" data-bk="'+x.id+'" data-a="reject">Rechazar</button></div></div>'}).join('');
   shell(h)})}
-function verRec(id){fetch('/api/admin/receipts/'+id,{headers:{Authorization:'Bearer '+T}}).then(function(r){return r.blob()}).then(function(b){var u=URL.createObjectURL(b);open('<h2>Comprobante</h2>'+(b.type==='application/pdf'?'<p><a href="'+u+'" target="_blank" rel="noopener">Abrir el PDF ↗</a></p>':'<img src="'+u+'" style="max-width:100%;border-radius:10px" alt="Comprobante">')+'<div style="margin-top:12px"><button class="btn g" onclick="document.getElementById(\'ov\').classList.remove(\'on\')">Cerrar</button></div>')})}
+function verRec(id){fetch(BASE+'/api/admin/receipts/'+id,{headers:{Authorization:'Bearer '+T}}).then(function(r){return r.blob()}).then(function(b){var u=URL.createObjectURL(b);open('<h2>Comprobante</h2>'+(b.type==='application/pdf'?'<p><a href="'+u+'" target="_blank" rel="noopener">Abrir el PDF ↗</a></p>':'<img src="'+u+'" style="max-width:100%;border-radius:10px" alt="Comprobante">')+'<div style="margin-top:12px"><button class="btn g" onclick="document.getElementById(\'ov\').classList.remove(\'on\')">Cerrar</button></div>')})}
 
 // ── horario semanal ──
 function vHorario(){var c=S.cat,dn={};c.disciplines.forEach(function(d){dn[d.id]=d});
@@ -204,7 +205,7 @@ function alumnoDlg(id){api('GET','/admin/students/'+id).then(function(r){if(!r.o
 })}
 
 // ── ajustes ──
-function vAjustes(){var s=S.studio,url=location.origin+'/e/'+s.slug;
+function vAjustes(){var s=S.studio,url=location.origin+BASE+'/e/'+s.slug;
   var h='<h2>Ajustes</h2><div class="card"><p style="margin-top:0">Tu página pública: <a href="'+esc(url)+'" target="_blank" rel="noopener">'+esc(url)+'</a></p><div class="g2">'
     +'<label class="f">Nombre del estudio<input id="jN" value="'+esc(s.name)+'"></label><label class="f">Color<input id="jC" type="color" value="'+esc(s.color)+'" style="height:40px;padding:3px"></label>'
     +'<label class="f">Dirección<input id="jA" value="'+esc(s.address||'')+'"></label><label class="f">WhatsApp de contacto<input id="jW" value="'+esc(s.whatsapp||'')+'"></label></div>'

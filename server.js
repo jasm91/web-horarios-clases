@@ -11,12 +11,17 @@ const db = require('./db');
 const core = require('./core');
 const { Regla } = core;
 
+const VERSION = '0.2.0';
 const app = express();
 app.set('trust proxy', 1);
 app.use(express.json({ limit: '8mb' }));
 
-const SECRET = process.env.APP_SECRET || crypto.randomBytes(32).toString('hex');
-if (!process.env.APP_SECRET) console.warn('⚠️  APP_SECRET no está definido: las sesiones se cierran en cada reinicio.');
+// Dentro de otro sistema (CLASES_SCHEMA): el secreto se deriva del suyo y las altas de estudio solo las hace su administrador.
+const EMBEBIDO = !!db.esquema;
+const _derivado = EMBEBIDO && process.env.JWT_SECRET ? crypto.createHmac('sha256', process.env.JWT_SECRET).update('clases-v1').digest('hex') : null;
+const SECRET = process.env.CLASES_SECRET || process.env.APP_SECRET || _derivado || crypto.randomBytes(32).toString('hex');
+if (!process.env.CLASES_SECRET && !process.env.APP_SECRET && !_derivado) console.warn('⚠️  [clases] sin secreto fijo: las sesiones se cierran en cada reinicio.');
+const _igual = (a, b) => { const x = Buffer.from(String(a || '')), y = Buffer.from(String(b || '')); return x.length === y.length && x.length > 0 && crypto.timingSafeEqual(x, y); };
 
 // ── tokens firmados (sin dependencias) ──
 function firmar(obj, dias) {
@@ -126,7 +131,9 @@ const colorOk = (c) => /^#[0-9a-fA-F]{6}$/.test(String(c || ''));
 app.post('/api/studios', wrap(async (req, res) => {
   if (!limite('alta:' + req.ip, 5, 3600000)) return res.status(429).json({ ok: false, error: 'Demasiadas altas desde esta conexión.' });
   const b = req.body || {};
-  if (process.env.SETUP_KEY && b.setup_key !== process.env.SETUP_KEY) return res.status(403).json({ ok: false, error: 'Clave de alta incorrecta.' });
+  if (EMBEBIDO) { // el alta de estudios la hace solo el administrador de la plataforma
+    if (!_igual(req.headers['x-admin-token'], process.env.ADMIN_TOKEN) && !_igual(b.setup_key, process.env.CLASES_SETUP_KEY)) return res.status(403).json({ ok: false, error: 'El alta de estudios la hace el equipo de la plataforma.' });
+  } else if (process.env.SETUP_KEY && b.setup_key !== process.env.SETUP_KEY) return res.status(403).json({ ok: false, error: 'Clave de alta incorrecta.' });
   const slug = String(b.slug || '').toLowerCase().trim(), name = String(b.name || '').trim().slice(0, 80), email = String(b.email || '').toLowerCase().trim();
   if (!slugOk(slug)) throw new Regla('slug', 'La dirección va en minúsculas, con letras, números y guiones (3 a 40).');
   if (name.length < 2) throw new Regla('nombre', 'Falta el nombre del estudio.');
@@ -371,7 +378,7 @@ itg.get('/events', wrap(async (req, res) => {
 app.use('/api/integration', itg);
 
 // ═════════════════════ PÁGINAS ═════════════════════
-app.get('/api/health', (req, res) => res.json({ ok: true, service: 'horarios-clases', version: require('./package.json').version }));
+app.get('/api/health', (req, res) => res.json({ ok: true, service: 'horarios-clases', version: VERSION, embebido: EMBEBIDO }));
 const pagina = (f) => (req, res) => res.set('Cache-Control', 'no-cache').sendFile(path.join(__dirname, 'public', f));
 app.get('/e/:slug', pagina('estudio.html'));
 app.get('/admin', pagina('admin.html'));
@@ -383,3 +390,5 @@ if (require.main === module) {
   db.init().then(() => app.listen(port, () => console.log(`🗓️  Horarios de clases en el puerto ${port}`))).catch((e) => { console.error('No se pudo iniciar la base:', e.message); process.exit(1); });
 }
 module.exports = app;
+module.exports.app = app;
+module.exports.init = () => db.init();

@@ -1,12 +1,19 @@
 // Conexión y esquema. El esquema se crea solo al arrancar (idempotente).
+// Dos formas de correr:
+//   · suelto: base propia (DATABASE_URL), tablas en el esquema por defecto.
+//   · dentro de otro sistema (Aitana CRM): CLASES_SCHEMA=clases → mismas tablas, pero en un ESQUEMA APARTE de la misma base,
+//     con un pool propio. Las tablas del sistema anfitrión no se tocan aunque se llamen igual (sessions, events, packages…).
 const { Pool } = require('pg');
 
 const url = process.env.DATABASE_URL || 'postgres://postgres@localhost:5432/clases';
-const pool = new Pool({
+const ESQUEMA = /^[a-z][a-z0-9_]{1,30}$/.test(process.env.CLASES_SCHEMA || '') ? process.env.CLASES_SCHEMA : null;
+const pool = new Pool(Object.assign({
   connectionString: url,
-  ssl: /railway|render|amazonaws|neon|supabase/.test(url) && !/sslmode=disable/.test(url) && !/\.internal/.test(url) ? { rejectUnauthorized: false } : undefined,
-  max: 10,
-});
+  max: ESQUEMA ? 4 : 10,
+}, ESQUEMA
+  ? { ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false, options: `-c search_path=${ESQUEMA}`, idleTimeoutMillis: 30000 }
+  : { ssl: /railway|render|amazonaws|neon|supabase/.test(url) && !/sslmode=disable/.test(url) && !/\.internal/.test(url) ? { rejectUnauthorized: false } : undefined }));
+pool.on('error', (e) => console.error('[clases] pg:', e.message));
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS studios (
@@ -139,6 +146,20 @@ CREATE INDEX IF NOT EXISTS events_studio ON events (studio_id, id);
 `;
 
 let ready = null;
-function init() { if (!ready) ready = pool.query(SCHEMA); return ready; }
+async function _init() {
+  if (ESQUEMA) {
+    await pool.query(`CREATE SCHEMA IF NOT EXISTS ${ESQUEMA}`);
+    // Seguro: si la conexión NO quedó parada en el esquema propio, no se crea ni se toca nada.
+    const c = await pool.connect();
+    try {
+      const r = await c.query('SELECT current_schema() AS s');
+      if (r.rows[0].s !== ESQUEMA) throw new Error(`la conexión quedó en el esquema «${r.rows[0].s}» y no en «${ESQUEMA}»`);
+      await c.query(SCHEMA);
+    } finally { c.release(); }
+    return;
+  }
+  await pool.query(SCHEMA);
+}
+function init() { if (!ready) ready = _init().catch((e) => { ready = null; throw e; }); return ready; }
 
-module.exports = { pool, init, query: (t, p) => pool.query(t, p) };
+module.exports = { pool, init, esquema: ESQUEMA, query: (t, p) => pool.query(t, p) };

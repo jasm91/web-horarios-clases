@@ -28,7 +28,7 @@ a.g{color:var(--ink)}
     <li><b>Paquetes de sesiones</b>Saldo y vencimiento por alumno. Compra por QR con comprobante.</li>
     <li><b>Tu regla de cancelación</b>A tiempo, la sesión vuelve al paquete. Tarde, se descuenta.</li>
   </ul>
-  <a class="b" href="/admin">Entrar al panel</a>
+  <a class="b" id="irPanel" href="/admin">Entrar al panel</a><script>if(location.pathname.indexOf('/clases')===0)document.getElementById('irPanel').href='/clases/admin'</script>
 </main>
 </body>
 </html>
